@@ -45,11 +45,8 @@ def download():
 		zipfilename.extractall("data")
 
 
-def ingest():
-	"""Ingest everything in the csv into the cluster"""
-	# create the mappings in elasticsearch
-	Company.init()
-
+def company_count():
+	"""Check how many rows to ingest"""
 	row_count = 0
 	with open('data\\BasicCompanyDataAsOneFile-2019-04-01.csv', 'r', encoding='utf8') as csvin:
 		companies = csv.reader(csvin)
@@ -58,6 +55,12 @@ def ingest():
 			row_count += 1
 
 	print('{time} Rows to ingest {x}'.format(x=row_count, time=datetime.now()))
+
+
+def ingest():
+	"""Ingest everything in the csv into the cluster"""
+	# create the mappings in elasticsearch
+	Company.init()
 
 	row_count = 0
 	with open('data\\BasicCompanyDataAsOneFile-2019-04-01.csv', 'r', encoding='utf8') as csvin:
@@ -89,4 +92,5 @@ def ingest():
 
 if __name__ == "__main__":
 	download()
+	company_count()
 	ingest()
