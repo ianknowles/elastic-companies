@@ -1,6 +1,6 @@
 import csv
 import shutil
-import urllib
+import urllib.request
 import zipfile
 from datetime import datetime
 from elasticsearch_dsl import Document, Date, Integer, Keyword, Text
