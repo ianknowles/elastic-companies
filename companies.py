@@ -1,4 +1,5 @@
 import csv
+import os
 import shutil
 import urllib.request
 import zipfile
@@ -6,7 +7,15 @@ from datetime import datetime
 from elasticsearch_dsl import Document, Date, Integer, Keyword, Text
 from elasticsearch_dsl.connections import connections
 
-# Localhost for this example, point to your node on local network or online
+companies_zip_url = 'http://download.companieshouse.gov.uk/BasicCompanyDataAsOneFile-2019-04-01.zip'
+companies_zip_file = 'BasicCompanyDataAsOneFile-2019-04-01.zip'
+# Directory objects?
+file_path = os.path.dirname(os.path.realpath(__file__))
+project_path = os.path.normpath(os.path.join(file_path, '..', '..'))
+data_path = os.path.join(project_path, 'data')
+companies_csv_filename = 'BasicCompanyDataAsOneFile-2019-04-01.csv'
+companies_csv_filepath = os.path.join(data_path, companies_csv_filename)
+
 connections.create_connection(hosts=['localhost'])
 
 
@@ -36,11 +45,13 @@ class Company(Document):
 
 def download():
 	"""Download the csv from companies house"""
-	companies_zip_url = 'http://download.companieshouse.gov.uk/BasicCompanyDataAsOneFile-2019-04-01.zip'
-	companies_zip_file = 'BasicCompanyDataAsOneFile-2019-04-01.zip'
+	print('{time} Downloading companies house zip'.format(time=datetime.now()))
 	with urllib.request.urlopen(companies_zip_url) as response, open(companies_zip_file, 'wb') as out_file:
 		shutil.copyfileobj(response, out_file)
 
+
+def unzip():
+	print('{time} Unzipping companies house zip'.format(time=datetime.now()))
 	with zipfile.ZipFile(companies_zip_file, 'r') as zipfilename:
 		zipfilename.extractall("data")
 
@@ -48,7 +59,7 @@ def download():
 def company_count():
 	"""Check how many rows to ingest"""
 	row_count = 0
-	with open('data\\BasicCompanyDataAsOneFile-2019-04-01.csv', 'r', encoding='utf8') as csvin:
+	with open(companies_csv_filepath, 'r', encoding='utf8') as csvin:
 		companies = csv.reader(csvin)
 
 		for company in companies:
@@ -63,7 +74,7 @@ def ingest():
 	Company.init()
 
 	row_count = 0
-	with open('data\\BasicCompanyDataAsOneFile-2019-04-01.csv', 'r', encoding='utf8') as csvin:
+	with open(companies_csv_filepath, 'r', encoding='utf8') as csvin:
 		companies = csv.reader(csvin)
 
 		for row in companies:
@@ -91,6 +102,9 @@ def ingest():
 
 
 if __name__ == "__main__":
-	download()
+	if not os.path.isfile(companies_zip_file):
+		download()
+	if not os.path.isfile(companies_csv_filepath):
+		unzip()
 	company_count()
 	ingest()
