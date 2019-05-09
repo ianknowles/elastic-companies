@@ -208,7 +208,7 @@ def ingest():
 				if (row_count % 1000) == 0:
 					print('{time} Ingested {x}'.format(x=row_count, time=datetime.now()))
 			except UnicodeDecodeError:
-				print('{time} unicode error'.format(time=datetime.now()))
+				print('{time} unicode error on row {x}, {name}'.format(time=datetime.now(), x=row_count, name=row['CompanyName']))
 
 
 	# create and save and article
