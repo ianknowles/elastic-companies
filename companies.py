@@ -143,7 +143,7 @@ def ingest():
 
 	row_count = 0
 	with open(companies_csv_filepath, 'r', encoding='utf8') as csvin:
-		companies = csv.reader(csvin)
+		companies = csv.DictReader(csvin, skipinitialspace=True)
 
 		for row in companies:
 			try:
