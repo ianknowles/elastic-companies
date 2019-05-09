@@ -11,7 +11,7 @@ companies_zip_url = 'http://download.companieshouse.gov.uk/BasicCompanyDataAsOne
 companies_zip_file = 'BasicCompanyDataAsOneFile-2019-04-01.zip'
 # Directory objects?
 file_path = os.path.dirname(os.path.realpath(__file__))
-project_path = os.path.normpath(os.path.join(file_path, '..', '..'))
+project_path = os.path.normpath(os.path.join(file_path))
 data_path = os.path.join(project_path, 'data')
 companies_csv_filename = 'BasicCompanyDataAsOneFile-2019-04-01.csv'
 companies_csv_filepath = os.path.join(data_path, companies_csv_filename)
