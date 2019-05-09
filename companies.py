@@ -106,5 +106,11 @@ if __name__ == "__main__":
 		download()
 	if not os.path.isfile(companies_csv_filepath):
 		unzip()
+
 	company_count()
+
+	from elasticsearch_dsl import Index
+	i = Index('companies')
+	i.delete()
+
 	ingest()
