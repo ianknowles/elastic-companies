@@ -99,6 +99,7 @@ class Company(Document):
 		name = 'companies'
 		settings = {
 			"number_of_shards": 1,
+			"mapping.ignore_malformed": True,
 		}
 
 	def save(self, ** kwargs):
