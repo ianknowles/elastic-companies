@@ -160,10 +160,10 @@ def ingest():
 								  post_code=row['RegAddress.PostCode'])
 
 				accounts = Accounts(ref_day=row['Accounts.AccountRefDay'],
-									ref_month=row['Accounts.AccountRefMonth'] if row['Accounts.AccountRefMonth'] else None,
+									ref_month=row['Accounts.AccountRefMonth'],
 									next_due=row['Accounts.NextDueDate'],
 									last_made_up=row['Accounts.LastMadeUpDate'],
-									category=row['Accounts.AccountCategory'] if row['Accounts.AccountCategory'] else None)
+									category=row['Accounts.AccountCategory'])
 
 				returns = Returns(next_due=row['Returns.NextDueDate'], last_made_up=row['Returns.LastMadeUpDate'])
 
