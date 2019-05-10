@@ -74,7 +74,12 @@ class Company(Document):
 	accounts = Object(Accounts)
 	returns = Object(Returns)
 	mortgages = Object(Mortgages)
-	SIC_code = [Text(analyzer='snowball', fields={'raw': Keyword()}), Text(analyzer='snowball', fields={'raw': Keyword()}), Text(analyzer='snowball', fields={'raw': Keyword()}), Text(analyzer='snowball', fields={'raw': Keyword()})]
+	SIC_code = [
+		Text(analyzer='snowball', fields={'raw': Keyword()}),
+		Text(analyzer='snowball', fields={'raw': Keyword()}),
+		Text(analyzer='snowball', fields={'raw': Keyword()}),
+		Text(analyzer='snowball', fields={'raw': Keyword()})
+	]
 	limited_partnerships = Object(LimitedPartnerships)
 	URI = Keyword()
 	previous_name = Nested(PreviousName)
@@ -82,14 +87,15 @@ class Company(Document):
 
 	def add_address(self, care_of, po_box, line1, line2, town, county, country, post_code):
 		self.registered_address.update(
-			Address(care_of=care_of,
-					po_box=po_box,
-					line1=line1,
-					line2=line2,
-					town=town,
-					county=county,
-					country=country,
-					post_code=post_code))
+			Address(
+				care_of=care_of,
+				po_box=po_box,
+				line1=line1,
+				line2=line2,
+				town=town,
+				county=county,
+				country=country,
+				post_code=post_code))
 
 	def age(self):
 		return datetime.now() - self.incorporation
@@ -98,14 +104,14 @@ class Company(Document):
 		"""The index that all instances of this metadata will be saved to"""
 		name = 'companies'
 		settings = {
-			"number_of_shards": 1,
+			"number_of_shards"        : 1,
 			"mapping.ignore_malformed": True,
 		}
 
-	def save(self, ** kwargs):
+	def save(self, **kwargs):
 		"""Saves the current item to the index"""
-		#self.lines = len(self.body.split())
-		return super(Company, self).save(** kwargs)
+		# self.lines = len(self.body.split())
+		return super(Company, self).save(**kwargs)
 
 	def is_published(self):
 		return datetime.now() >= self.published_from
@@ -150,75 +156,90 @@ def ingest():
 				for key in row:
 					if not row[key]:
 						row[key] = None
-				address = Address(care_of=row['RegAddress.CareOf'],
-								  po_box=row['RegAddress.POBox'],
-								  line1=row['RegAddress.AddressLine1'],
-								  line2=row['RegAddress.AddressLine2'],
-								  town=row['RegAddress.PostTown'],
-								  county=row['RegAddress.County'],
-								  country=row['RegAddress.Country'],
-								  post_code=row['RegAddress.PostCode'])
+				address = Address(
+					care_of=row['RegAddress.CareOf'],
+					po_box=row['RegAddress.POBox'],
+					line1=row['RegAddress.AddressLine1'],
+					line2=row['RegAddress.AddressLine2'],
+					town=row['RegAddress.PostTown'],
+					county=row['RegAddress.County'],
+					country=row['RegAddress.Country'],
+					post_code=row['RegAddress.PostCode'])
 
-				accounts = Accounts(ref_day=row['Accounts.AccountRefDay'],
-									ref_month=row['Accounts.AccountRefMonth'],
-									next_due=row['Accounts.NextDueDate'],
-									last_made_up=row['Accounts.LastMadeUpDate'],
-									category=row['Accounts.AccountCategory'])
+				accounts = Accounts(
+					ref_day=row['Accounts.AccountRefDay'],
+					ref_month=row['Accounts.AccountRefMonth'],
+					next_due=row['Accounts.NextDueDate'],
+					last_made_up=row['Accounts.LastMadeUpDate'],
+					category=row['Accounts.AccountCategory'])
 
 				returns = Returns(next_due=row['Returns.NextDueDate'], last_made_up=row['Returns.LastMadeUpDate'])
 
-				confirmation_statement = Returns(next_due=row['ConfStmtNextDueDate'], last_made_up=row['ConfStmtLastMadeUpDate'])
+				confirmation_statement = Returns(
+					next_due=row['ConfStmtNextDueDate'],
+					last_made_up=row['ConfStmtLastMadeUpDate'])
 
-				mortgages = Mortgages(charges=row['Mortgages.NumMortCharges'],
-									  outstanding=row['Mortgages.NumMortOutstanding'],
-									  part_satisfied=row['Mortgages.NumMortPartSatisfied'],
-									  satisfied=row['Mortgages.NumMortSatisfied'])
+				mortgages = Mortgages(
+					charges=row['Mortgages.NumMortCharges'],
+					outstanding=row['Mortgages.NumMortOutstanding'],
+					part_satisfied=row['Mortgages.NumMortPartSatisfied'],
+					satisfied=row['Mortgages.NumMortSatisfied'])
 
-				limited_partnerships = LimitedPartnerships(general_partners=row['LimitedPartnerships.NumGenPartners'],limited_partners=row['LimitedPartnerships.NumLimPartners'])
+				limited_partnerships = LimitedPartnerships(
+					general_partners=row['LimitedPartnerships.NumGenPartners'],
+					limited_partners=row['LimitedPartnerships.NumLimPartners'])
 
-				previous_name = [PreviousName(name=row['PreviousName_1.CompanyName'], date=row['PreviousName_1.CONDATE']),
-								 PreviousName(name=row['PreviousName_2.CompanyName'], date=row['PreviousName_2.CONDATE']),
-								 PreviousName(name=row['PreviousName_3.CompanyName'], date=row['PreviousName_3.CONDATE']),
-								 PreviousName(name=row['PreviousName_4.CompanyName'], date=row['PreviousName_4.CONDATE']),
-								 PreviousName(name=row['PreviousName_5.CompanyName'], date=row['PreviousName_5.CONDATE']),
-								 PreviousName(name=row['PreviousName_6.CompanyName'], date=row['PreviousName_6.CONDATE']),
-								 PreviousName(name=row['PreviousName_7.CompanyName'], date=row['PreviousName_7.CONDATE']),
-								 PreviousName(name=row['PreviousName_8.CompanyName'], date=row['PreviousName_8.CONDATE']),
-								 PreviousName(name=row['PreviousName_9.CompanyName'], date=row['PreviousName_9.CONDATE']),
-								 PreviousName(name=row['PreviousName_10.CompanyName'], date=row['PreviousName_10.CONDATE'])]
+				previous_name = [
+					PreviousName(name=row['PreviousName_1.CompanyName'], date=row['PreviousName_1.CONDATE']),
+					PreviousName(name=row['PreviousName_2.CompanyName'], date=row['PreviousName_2.CONDATE']),
+					PreviousName(name=row['PreviousName_3.CompanyName'], date=row['PreviousName_3.CONDATE']),
+					PreviousName(name=row['PreviousName_4.CompanyName'], date=row['PreviousName_4.CONDATE']),
+					PreviousName(name=row['PreviousName_5.CompanyName'], date=row['PreviousName_5.CONDATE']),
+					PreviousName(name=row['PreviousName_6.CompanyName'], date=row['PreviousName_6.CONDATE']),
+					PreviousName(name=row['PreviousName_7.CompanyName'], date=row['PreviousName_7.CONDATE']),
+					PreviousName(name=row['PreviousName_8.CompanyName'], date=row['PreviousName_8.CONDATE']),
+					PreviousName(name=row['PreviousName_9.CompanyName'], date=row['PreviousName_9.CONDATE']),
+					PreviousName(name=row['PreviousName_10.CompanyName'], date=row['PreviousName_10.CONDATE'])]
 
-				company = Company(name=row['CompanyName'],
-								  number=row['CompanyNumber'],
-								  registered_address=address,
-								  category=row['CompanyCategory'],
-								  status=row['CompanyStatus'],
-								  country_of_origin=row['CountryOfOrigin'],
-								  dissolution=row['DissolutionDate'],
-								  incorporation=row['IncorporationDate'],
-								  accounts=accounts,
-								  returns=returns,
-								  mortgages=mortgages,
-								  SIC_code=[row['SICCode.SicText_1'], row['SICCode.SicText_2'], row['SICCode.SicText_3'], row['SICCode.SicText_4']],
-								  limited_partnerships=limited_partnerships,
-								  URI=row['URI'],
-								  previous_name=previous_name,
-								  confirmation_statement=confirmation_statement)
+				company = Company(
+					name=row['CompanyName'],
+					number=row['CompanyNumber'],
+					registered_address=address,
+					category=row['CompanyCategory'],
+					status=row['CompanyStatus'],
+					country_of_origin=row['CountryOfOrigin'],
+					dissolution=row['DissolutionDate'],
+					incorporation=row['IncorporationDate'],
+					accounts=accounts,
+					returns=returns,
+					mortgages=mortgages,
+					SIC_code=[
+						row['SICCode.SicText_1'],
+						row['SICCode.SicText_2'],
+						row['SICCode.SicText_3'],
+						row['SICCode.SicText_4']],
+					limited_partnerships=limited_partnerships,
+					URI=row['URI'],
+					previous_name=previous_name,
+					confirmation_statement=confirmation_statement)
 				company.save()
 				row_count += 1
 				if (row_count % 1000) == 0:
 					print('{time} Ingested {x}'.format(x=row_count, time=datetime.now()))
 			except UnicodeDecodeError:
-				print('{time} unicode error on row {x}, {name}'.format(time=datetime.now(), x=row_count, name=row['CompanyName']))
-
+				print('{time} unicode error on row {x}, {name}'.format(
+					time=datetime.now(),
+					x=row_count,
+					name=row['CompanyName']))
 
 	# create and save and article
-	#article = Company(meta={'id': 42}, title='Hello world!', tags=['test'])
-	#article.body = ''' looong text '''
-	#article.published_from = datetime.now()
-	#article.save()
+	# article = Company(meta={'id': 42}, title='Hello world!', tags=['test'])
+	# article.body = ''' looong text '''
+	# article.published_from = datetime.now()
+	# article.save()
 
-	#article = Company.get(id=42)
-	#print(article.is_published())
+	# article = Company.get(id=42)
+	# print(article.is_published())
 
 	# Display cluster health
 	print(connections.get_connection().cluster.health())
@@ -233,6 +254,7 @@ if __name__ == "__main__":
 	company_count()
 
 	from elasticsearch_dsl import Index
+
 	i = Index('companies')
 	i.delete()
 
