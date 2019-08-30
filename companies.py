@@ -243,15 +243,6 @@ def ingest():
 					x=row_count,
 					name=row['CompanyName']))
 
-	# create and save and article
-	# article = Company(meta={'id': 42}, title='Hello world!', tags=['test'])
-	# article.body = ''' looong text '''
-	# article.published_from = datetime.now()
-	# article.save()
-
-	# article = Company.get(id=42)
-	# print(article.is_published())
-
 	# Display cluster health
 	print(connections.get_connection().cluster.health())
 
