@@ -7,11 +7,12 @@ from datetime import datetime
 from elasticsearch_dsl import Document, Date, Integer, Keyword, Text, InnerDoc, Object, Byte, Nested, Short
 from elasticsearch_dsl.connections import connections
 
+# Download and file paths
 download_url = 'http://download.companieshouse.gov.uk/'
 companies_zip_file = 'BasicCompanyDataAsOneFile-2019-04-01.zip'
 companies_zip_url = download_url + companies_zip_file
 
-# Directory objects?
+# TODO Directory objects?
 file_path = os.path.dirname(os.path.realpath(__file__))
 project_path = os.path.normpath(os.path.join(file_path))
 data_path = os.path.join(project_path, 'data')
@@ -22,6 +23,7 @@ connections.create_connection(hosts=['localhost'])
 
 
 class Address(InnerDoc):
+	"""Class representing an Address field"""
 	care_of = Text(fields={'raw': Keyword()})
 	po_box = Text(fields={'raw': Keyword()})
 	line1 = Text(fields={'raw': Keyword()})
@@ -33,6 +35,7 @@ class Address(InnerDoc):
 
 
 class Accounts(InnerDoc):
+	"""Class representing an accounts field"""
 	ref_day = Byte()
 	ref_month = Byte()
 	next_due = Date(format='dd/MM/yyyy')
@@ -41,11 +44,13 @@ class Accounts(InnerDoc):
 
 
 class Returns(InnerDoc):
+	"""Class representing a returns field"""
 	next_due = Date(format='dd/MM/yyyy')
 	last_made_up = Date(format='dd/MM/yyyy')
 
 
 class Mortgages(InnerDoc):
+	"""Class representing a mortgage field"""
 	charges = Short()
 	outstanding = Short()
 	part_satisfied = Short()
@@ -53,11 +58,13 @@ class Mortgages(InnerDoc):
 
 
 class LimitedPartnerships(InnerDoc):
+	"""Class representing a limited partnerships field"""
 	general_partners = Short()
 	limited_partners = Short()
 
 
 class PreviousName(InnerDoc):
+	"""Class representing a previous name field"""
 	company_name = Text(analyzer='snowball', fields={'raw': Keyword()})
 	date = Date(format='dd/MM/yyyy')
 
@@ -88,6 +95,7 @@ class Company(Document):
 	confirmation_statement = Object(Returns)
 
 	def add_address(self, care_of, po_box, line1, line2, town, county, country, post_code):
+		"""Change the registered address"""
 		self.registered_address.update(
 			Address(
 				care_of=care_of,
@@ -127,6 +135,7 @@ def download():
 
 
 def unzip():
+	"""Unzip the csv"""
 	print('{time} Unzipping companies house zip'.format(time=datetime.now()))
 	with zipfile.ZipFile(companies_zip_file, 'r') as zipfilename:
 		zipfilename.extractall("data")
