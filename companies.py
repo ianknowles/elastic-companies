@@ -12,16 +12,12 @@ from elasticsearch_dsl import Document, Date, Keyword, Text, InnerDoc, Object, B
 from elasticsearch_dsl.connections import connections
 
 # Download and file paths
-download_url = 'http://download.companieshouse.gov.uk/'
-companies_zip_file = 'BasicCompanyDataAsOneFile-2019-04-01.zip'
-companies_zip_url = download_url + companies_zip_file
-
 # TODO Directory objects?
 file_path = os.path.dirname(os.path.realpath(__file__))
 project_path = os.path.normpath(os.path.join(file_path))
 data_path = os.path.join(project_path, 'data')
-companies_csv_filename = 'BasicCompanyDataAsOneFile-2019-04-01.csv'
-companies_csv_filepath = os.path.join(data_path, companies_csv_filename)
+
+download_url = 'http://download.companieshouse.gov.uk/'
 
 connections.create_connection(hosts=['localhost'])
 
@@ -135,24 +131,24 @@ class Company(Document):
 		return super(Company, self).save(**kwargs)
 
 
-def download():
+def download(zip_url, zip_filepath):
 	"""Download the csv from companies house"""
 	print('{time} Downloading companies house zip'.format(time=datetime.now()))
-	with urllib.request.urlopen(companies_zip_url) as response, open(companies_zip_file, 'wb') as out_file:
+	with urllib.request.urlopen(zip_url) as response, open(zip_filepath, 'wb') as out_file:
 		shutil.copyfileobj(response, out_file)
 
 
-def unzip():
+def unzip(zip_filepath, output_path):
 	"""Unzip the csv"""
 	print('{time} Unzipping companies house zip'.format(time=datetime.now()))
-	with zipfile.ZipFile(companies_zip_file, 'r') as zipfilename:
-		zipfilename.extractall("data")
+	with zipfile.ZipFile(zip_filepath, 'r') as zipfilename:
+		zipfilename.extractall(output_path)
 
 
-def company_count():
+def company_count(filepath):
 	"""Check how many rows to ingest"""
 	row_count = 0
-	with open(companies_csv_filepath, 'r', encoding='utf8') as csvin:
+	with open(filepath, 'r', encoding='utf8') as csvin:
 		companies = csv.reader(csvin)
 
 		for company in companies:
@@ -161,13 +157,13 @@ def company_count():
 	print('{time} Rows to ingest {x}'.format(x=row_count, time=datetime.now()))
 
 
-def ingest():
+def ingest(filepath):
 	"""Ingest everything in the csv into the cluster"""
 	# create the mappings in elasticsearch
 	Company.init()
 
 	row_count = 0
-	with open(companies_csv_filepath, 'r', encoding='utf8') as csvin:
+	with open(filepath, 'r', encoding='utf8') as csvin:
 		companies = csv.DictReader(csvin, skipinitialspace=True)
 
 		for row in companies:
@@ -255,17 +251,29 @@ def ingest():
 	print(connections.get_connection().cluster.health())
 
 
-if __name__ == "__main__":
-	if not os.path.isfile(companies_zip_file):
-		download()
-	if not os.path.isfile(companies_csv_filepath):
-		unzip()
+def setup_company_index(companies_file):
+	"""Download companies house data and ingest it into the companies house index"""
+	companies_zip_filename = companies_file + '.zip'
+	companies_zip_url = download_url + companies_zip_filename
+	companies_zip_filepath = os.path.join(data_path, companies_zip_filename)
 
-	company_count()
+	companies_csv_filename = companies_file + '.csv'
+	companies_csv_filepath = os.path.join(data_path, companies_csv_filename)
+
+	if not os.path.isfile(companies_zip_filepath):
+		download(companies_zip_url, companies_zip_filepath)
+	if not os.path.isfile(companies_csv_filepath):
+		unzip(companies_zip_filepath, data_path)
+
+	company_count(companies_csv_filepath)
 
 	from elasticsearch_dsl import Index
 
 	i = Index('companies')
 	i.delete()
 
-	ingest()
+	ingest(companies_csv_filepath)
+
+
+if __name__ == "__main__":
+	setup_company_index('BasicCompanyDataAsOneFile-2019-04-01')
