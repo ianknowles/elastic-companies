@@ -108,7 +108,14 @@ class Company(Document):
 				post_code=post_code))
 
 	def age(self):
+		"""Calculate the current age of the company"""
+		if self.is_dissolved():
+			return self.dissolution - self.incorporation
 		return datetime.now() - self.incorporation
+
+	def is_dissolved(self):
+		"""Check if the company has been dissolved"""
+		return self.dissolution >= self.incorporation
 
 	class Index:
 		"""The index that all instances of this metadata will be saved to"""
@@ -122,9 +129,6 @@ class Company(Document):
 		"""Saves the current item to the index"""
 		# self.lines = len(self.body.split())
 		return super(Company, self).save(**kwargs)
-
-	def is_published(self):
-		return datetime.now() >= self.published_from
 
 
 def download():
