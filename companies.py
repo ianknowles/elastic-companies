@@ -4,7 +4,7 @@ import shutil
 import urllib.request
 import zipfile
 from datetime import datetime
-from elasticsearch_dsl import Document, Date, Integer, Keyword, Text, InnerDoc, Object, Byte, Nested, Short
+from elasticsearch_dsl import Document, Date, Keyword, Text, InnerDoc, Object, Byte, Nested, Short
 from elasticsearch_dsl.connections import connections
 
 # Download and file paths
