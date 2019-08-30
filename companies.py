@@ -1,3 +1,7 @@
+"""
+	Run this module to download and ingest companies house data to an elastic cluster
+	Import the companies class to search the cluster and examine company data
+"""
 import csv
 import os
 import shutil
