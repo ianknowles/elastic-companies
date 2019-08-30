@@ -7,8 +7,10 @@ from datetime import datetime
 from elasticsearch_dsl import Document, Date, Integer, Keyword, Text, InnerDoc, Object, Byte, Nested, Short
 from elasticsearch_dsl.connections import connections
 
-companies_zip_url = 'http://download.companieshouse.gov.uk/BasicCompanyDataAsOneFile-2019-04-01.zip'
+download_url = 'http://download.companieshouse.gov.uk/'
 companies_zip_file = 'BasicCompanyDataAsOneFile-2019-04-01.zip'
+companies_zip_url = download_url + companies_zip_file
+
 # Directory objects?
 file_path = os.path.dirname(os.path.realpath(__file__))
 project_path = os.path.normpath(os.path.join(file_path))
