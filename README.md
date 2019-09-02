@@ -3,14 +3,14 @@ The first example script companies.py shows how to properly create a python clas
 import it into an Elasticsearch cluster. The second script query.py demonstrates how to query the cluster for matches
 against the data.
 
-This example requires:
+These examples require:
 * Elasticsearch
 * Python 3.6+
 * Python packages
   * elasticsearch 
   * elasticsearch-dsl
 
-## Elasicsearch cluster setup
+## Elasticsearch cluster setup
 Download the MSI from https://www.elastic.co/downloads/elasticsearch
 
 Install and follow the install steps at the download URL.
