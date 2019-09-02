@@ -48,4 +48,6 @@ class is used for fields that may repeat many times, such as previous company na
 
 
 ## TODO
-Integrating new data into an existing cluster.
+* Integrating new data into an existing cluster.
+* Complex queries
+* Queries across data from 2 indices.
